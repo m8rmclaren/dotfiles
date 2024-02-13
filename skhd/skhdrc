@@ -1,0 +1,10 @@
+# Equalize size of windows
+ctrl + alt + shift - e : yabai -m space --balance
+
+# Rotate windows clockwise and anticlockwise
+ctrl + alt - r         : yabai -m space --rotate 270
+ctrl + alt + shift - r : yabai -m space --rotate 90
+
+# Rotate on X and Y Axis
+ctrl + alt - x : yabai -m space --mirror x-axis
+ctrl + alt - y : yabai -m space --mirror y-axis

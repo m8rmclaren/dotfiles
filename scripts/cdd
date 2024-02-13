@@ -1,0 +1,6 @@
+selected=$(find ~/Documents/dev -mindepth 2 -maxdepth 2 -type d | fzf --layout reverse --prompt "Select a project: " --preview "ls {}" --preview-window=up:30%)
+if [ -n "$selected" ]; then
+    cd "$selected"
+else
+    echo "No directory selected."
+fi
