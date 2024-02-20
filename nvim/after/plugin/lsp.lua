@@ -5,11 +5,11 @@ lsp_zero.on_attach(function(client, bufnr)
     -- to learn the available actions
     local opts = {buffer = bufnr, remap = false}
 
-    vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
-    vim.keymap.set("n", "gb", "<C-o>", opts)
-    vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, opts)
-    vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts)
-    vim.keymap.set("n", "<leader>s", function() vim.lsp.buf.hover() end, opts)
+    -- vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
+    -- vim.keymap.set("n", "gb", "<C-o>", opts)
+    vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, opts, { desc = "Code action" })
+    vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts, { desc = "Rename under cursor" })
+    vim.keymap.set("n", "<leader>s", function() vim.lsp.buf.hover() end, opts, { desc = "Show hover information" })
 
     lsp_zero.default_keymaps({buffer = bufnr})
 end)

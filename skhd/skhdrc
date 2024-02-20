@@ -1,5 +1,5 @@
 # Equalize size of windows
-ctrl + alt + shift - e : yabai -m space --balance
+ctrl + alt - e : yabai -m space --layout bsp && yabai -m space --balance && sketchybar --reload
 
 # Rotate windows clockwise and anticlockwise
 ctrl + alt - r         : yabai -m space --rotate 270
@@ -8,3 +8,9 @@ ctrl + alt + shift - r : yabai -m space --rotate 90
 # Rotate on X and Y Axis
 ctrl + alt - x : yabai -m space --mirror x-axis
 ctrl + alt - y : yabai -m space --mirror y-axis
+
+# Map Ctrl + W to Option + Backspace when iTerm2 is not focused
+ctrl - w [
+    *        : skhd -k "alt - backspace"
+    "wTerm2" ~
+]

@@ -1,0 +1,35 @@
+
+lab_root=$(find ~/Documents/dev/lab -mindepth 1 -maxdepth 1 -type d | fzf --layout reverse --prompt "Select the lab that contains the script you want to alias: " --preview "ls {}" --preview-window=up:30%)
+
+if [[ -z $lab_root ]]; then
+    return 1
+fi
+
+lab_name=$(basename $lab_root)
+
+script=$(find $lab_root -type f | xargs -I {} basename {} | fzf --layout reverse --prompt "Select the script you want to alias: " --preview "cat $lab_root/{}" --preview-window=up:30%)
+
+action=$(printf 'sourced\nrun' | fzf --height 40% --layout reverse --prompt "Should the script be sourced or run? ")
+
+if [[ -z $action ]]; then
+    return 1
+fi
+
+read "aliasname?What should the alias be called for $script that will be $action from the $lab_name lab: "
+
+if [[ -z $aliasname ]]; then
+    return 1
+fi
+
+echo "Creating alias called $aliasname that will $action $script from the $lab_name lab."
+
+chmod +x $lab_root/$script
+
+if [[ $action == "sourced" ]]; then
+    eval "function $aliasname() { source $lab_root/$script; }"
+    alias "$aliasname=$aliasname"
+else
+    alias "$aliasname='$lab_root/$script'"
+fi
+
+[[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] || source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-if [[ $# -eq 1 ]]; then
-    selected=$1
-else
-    selected=$(find ~/Documents/dev -mindepth 2 -maxdepth 2 -type d | fzf)
-fi
+
+defaults=("$HOME/.config")
+dev_dirs=$(find ~/Documents/dev -mindepth 2 -maxdepth 2 -type d)
+selected=$(echo -e "${dev_dirs}\n$(printf "%s\n" $defaults)" | fzf --layout reverse --prompt "Select a project: " --preview "ls {}" --preview-window=up:30%)
 
 if [[ -z $selected ]]; then
     exit 0

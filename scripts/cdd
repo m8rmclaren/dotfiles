@@ -1,4 +1,9 @@
-selected=$(find ~/Documents/dev -mindepth 2 -maxdepth 2 -type d | fzf --layout reverse --prompt "Select a project: " --preview "ls {}" --preview-window=up:30%)
+defaults=("$HOME/.config")
+
+dev_dirs=$(find ~/Documents/dev -mindepth 2 -maxdepth 2 -type d)
+
+selected=$(echo -e "${dev_dirs}\n$(printf "%s\n" $defaults)" | fzf --layout reverse --prompt "Select a project: " --preview "ls {}" --preview-window=up:30%)
+
 if [ -n "$selected" ]; then
     cd "$selected"
 else

@@ -20,4 +20,4 @@ local function toggle_focused_terminal()
     workspace_focus_terminal:set_mode("i")
 end
 
-vim.keymap.set("n", "<leader>tt", function() toggle_focused_terminal() end)
+vim.keymap.set("n", "<leader>tt", function() toggle_focused_terminal() end, {desc = "Toggle focused terminal"})

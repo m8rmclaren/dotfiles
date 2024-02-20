@@ -33,6 +33,7 @@ return require('packer').startup(function(use)
     use("nvim-treesitter/nvim-treesitter-context")
     use("mbbill/undotree") -- undo history visualizer
     use("tpope/vim-commentary") -- "gc" to comment visual regions/lines
+    use("tpope/vim-surround")
     use("lukas-reineke/indent-blankline.nvim")
     use("windwp/nvim-autopairs")
     use("alexghergh/nvim-tmux-navigation")
