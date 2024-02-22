@@ -21,14 +21,20 @@ launchctl unload -F /System/Library/LaunchAgents/com.apple.OSDUIHelper.plist > /
 # Set the yabai top padding depending on the resolution of connected displays
 connected_display_count=$(yabai -m query --displays | jq length)
 if [ $connected_display_count -eq 1 ]; then
-  yabai -m config top_padding 12
+  yabai -m config top_padding 6
+  corner_radius=0
+  y_offset=-4
+  margin=-2
 else
-  yabai -m config top_padding 44
+  yabai -m config top_padding 48
+  corner_radius=10
+  y_offset=4
+  margin=4
 fi
 
 # Setting up the general bar appearance of the bar
 bar=(
-  height=45
+  height=39
   color=$BAR_COLOR
   border_width=2
   border_color=$BAR_BORDER_COLOR
@@ -37,8 +43,9 @@ bar=(
   sticky=on
   padding_right=10
   padding_left=10
-  y_offset=-5
-  margin=-2
+  corner_radius=$corner_radius
+  y_offset=$y_offset
+  margin=$margin
   topmost=window
 )
 

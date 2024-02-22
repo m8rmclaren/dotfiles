@@ -12,5 +12,5 @@ ctrl + alt - y : yabai -m space --mirror y-axis
 # Map Ctrl + W to Option + Backspace when iTerm2 is not focused
 ctrl - w [
     *        : skhd -k "alt - backspace"
-    "wTerm2" ~
+    "iTerm2" ~
 ]
