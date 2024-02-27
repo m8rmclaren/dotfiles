@@ -1,5 +1,100 @@
 
-lab_root=$(find ~/Documents/dev/lab -mindepth 1 -maxdepth 1 -type d | fzf --layout reverse --prompt "Select the lab that contains the script you want to alias: " --preview "ls {}" --preview-window=up:30%)
+create_alias() {
+    local lab_root=$1
+    local script=$2
+    local action=$3
+    local aliasname=$4
+    local lab_name=$(basename $lab_root)
+
+    if [[ $action == "sourced" ]]; then
+        echo "Creating function called $aliasname that will source $script from the $lab_name lab."
+    else
+        echo "Creating alias called $aliasname that will run $script from the $lab_name lab."
+    fi
+
+    if [[ $action == "sourced" ]]; then
+        eval "function $aliasname() { source $lab_root/$script; }"
+        alias "$aliasname=$aliasname"
+    else
+        chmod +x $lab_root/$script
+        alias "$aliasname='$lab_root/$script'"
+    fi
+}
+
+cache_alias() {
+    local lab_root=$1
+    local script=$2
+    local action=$3
+    local aliasname=$4
+    local project_cache=$5
+
+    if [ ! -f "$project_cache" ] || [ ! -s "$project_cache" ]; then
+        echo '[]' > "$project_cache"
+    fi
+
+    jq --arg lab_root "$lab_root" --arg script "$script" --arg action "$action" --arg aliasname "$aliasname" \
+        '. += [{"lab_root": $lab_root, "script": $script, "action": $action, "aliasname": $aliasname}]' \
+        "$project_cache" > tmp.$$ && mv tmp.$$ "$project_cache"
+
+    echo "Alias cached in $project_cache."
+}
+
+make_alias_cache_previewer() {
+    local tmp_script=$1
+
+    cat <<'EOF' > "$tmp_script"
+#!/bin/bash
+option=$1
+project_cache=$2
+
+if [[ $option == "create" ]]; then
+    echo "Create a new alias for the project."
+elif [[ $option == "restore" ]]; then
+    echo "Cached aliases:"
+    jq -r '.[] | .lab_root, .script, .action, .aliasname' $project_cache | while IFS= read -r lab_root && IFS= read -r script && IFS= read -r action && IFS= read -r aliasname; do
+        if [[ $action == "sourced" ]]; then
+            echo " - Source $script from the $(basename $lab_root) lab"
+        else
+            echo "Run $script from the $(basename $lab_root) lab"
+        fi
+    done
+elif [[ $option == "reset" ]]; then
+    echo "Reset the existing aliases for the project."
+fi
+EOF
+
+    chmod +x "$tmp_script"
+}
+
+project=$(basename $(pwd))
+project_cache="/tmp/$project-aliases.json"
+
+if [[ -f $project_cache ]]; then
+    tmp_script="/tmp/alias_cache_previewer.sh"
+    make_alias_cache_previewer "$tmp_script"
+
+    create_or_restore=$(printf 'create\nrestore\nreset' | fzf --height 40% --layout reverse --prompt "An alias cache for the $project project exists. Would you like to create a new alias or restore the existing aliases for the project? " --preview "$tmp_script {} $project_cache" --preview-window=up:30%)
+
+    rm "$tmp_script"
+
+    if [[ -z $create_or_restore ]]; then
+        echo "No action selected. Exiting."
+        return 1
+    fi
+
+    if [[ $create_or_restore == "restore" ]]; then
+        echo "Restoring aliases from $project_cache"
+        jq -r '.[] | .lab_root, .script, .action, .aliasname' $project_cache | while IFS= read -r lab_root && IFS= read -r script && IFS= read -r action && IFS= read -r aliasname; do
+            create_alias "$lab_root" "$script" "$action" "$aliasname"
+        done
+        return 0
+    elif [[ $create_or_restore == "reset" ]]; then
+        echo "Resetting aliases for $project"
+        rm $project_cache
+    fi
+fi
+
+lab_root=$(find ~/Documents/dev/lab -mindepth 1 -maxdepth 1 -type d | fzf --layout reverse --prompt "Select the lab that contains the script you want to alias: " --preview "tree -C {}" --preview-window=up:30%)
 
 if [[ -z $lab_root ]]; then
     return 1
@@ -7,7 +102,7 @@ fi
 
 lab_name=$(basename $lab_root)
 
-script=$(find $lab_root -type f | xargs -I {} basename {} | fzf --layout reverse --prompt "Select the script you want to alias: " --preview "cat $lab_root/{}" --preview-window=up:30%)
+script=$(find $lab_root -type f -mindepth 1 -maxdepth 1 | xargs -I {} basename {} | fzf --layout reverse --prompt "Select the script you want to alias: " --preview "cat $lab_root/{}" --preview-window=up:30%)
 
 action=$(printf 'sourced\nrun' | fzf --height 40% --layout reverse --prompt "Should the script be sourced or run? ")
 
@@ -21,15 +116,8 @@ if [[ -z $aliasname ]]; then
     return 1
 fi
 
-echo "Creating alias called $aliasname that will $action $script from the $lab_name lab."
-
-chmod +x $lab_root/$script
-
-if [[ $action == "sourced" ]]; then
-    eval "function $aliasname() { source $lab_root/$script; }"
-    alias "$aliasname=$aliasname"
-else
-    alias "$aliasname='$lab_root/$script'"
-fi
+create_alias $lab_root $script $action $aliasname
+cache_alias $lab_root $script $action $aliasname $project_cache
 
 [[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] || source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+

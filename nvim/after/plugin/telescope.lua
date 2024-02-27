@@ -16,6 +16,7 @@ vim.keymap.set('n', '<leader>fjl', builtin.jumplist, { desc = 'Fuzzy find jump l
 vim.keymap.set('n', 'gd', builtin.lsp_definitions, { desc = 'Go to definition' })
 vim.keymap.set('n', '<leader>fr', builtin.lsp_references, { desc = 'Fuzzy find references to the value under cursor' })
 vim.keymap.set('n', '<leader>fqf', builtin.quickfix, { desc = 'Fuzzy find quickfix list' })
+vim.keymap.set('n', '<leader>ft', builtin.lsp_type_definitions, { desc = 'Fuzzy find type definitions of the variable under cursor' })
 
 -- Treesitter pickers
-vim.keymap.set('n', '<leader>ft', builtin.treesitter, { desc = 'Fuzzy find treesitter for the current buffer' })
+-- vim.keymap.set('n', '<leader>ft', builtin.treesitter, { desc = 'Fuzzy find treesitter for the current buffer' })

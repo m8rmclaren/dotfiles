@@ -27,7 +27,7 @@ return require('packer').startup(function(use)
     }
     use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
 
-    use({'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'})
+    use({'nvim-treesitter/nvim-treesitter'})
     use("github/copilot.vim") -- Copilot integration
     use("tpope/vim-fugitive") -- Git commands in nvim
     use("nvim-treesitter/nvim-treesitter-context")
@@ -43,10 +43,6 @@ return require('packer').startup(function(use)
 
     -- Theme
     use { "catppuccin/nvim", as = "catppuccin" }
-    use({
-        'rose-pine/neovim',
-        as = 'rose-pine'
-    })
 
     -- Statusline
     use {
