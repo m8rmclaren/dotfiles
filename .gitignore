@@ -1,8 +1,21 @@
-.DS_Store
 github-copilot
+tmux/plugins/
+
+# Mac
+.DS_Store
 wireshark
 configstore
-tmux/plugins/
 iterm2
 font
 spicetify
+
+# Linux
+cef_user_data
+procps
+pulse
+yay
+mimeapps.list
+BraveSoftware
+systemd
+user-dirs.dirs
+user-dirs.locale
