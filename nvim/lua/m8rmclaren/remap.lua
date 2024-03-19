@@ -18,3 +18,6 @@ vim.api.nvim_set_keymap('n', '<leader>P', '"+P', { noremap = true, desc = 'Paste
 -- Visual mode - Paste from clipboard
 vim.api.nvim_set_keymap('v', '<leader>p', '"+p', { noremap = true, desc = 'Paste from clipboard' })
 vim.api.nvim_set_keymap('v', '<leader>P', '"+P', { noremap = true, desc = 'Paste from clipboard' })
+
+-- Create a newline under the current line
+vim.api.nvim_set_keymap('n', '<S-CR>', 'o<Esc>', { noremap = true, desc = 'Create a newline under the current line' })
