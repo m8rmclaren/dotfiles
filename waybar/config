@@ -1,0 +1,55 @@
+{
+    "layer": "top",
+    "modules-left": ["custom/arch", "hyprland/workspaces"],
+    "modules-center": ["clock"],
+    "modules-right": ["memory", "cpu", "pulseaudio", "bluetooth", "network"],
+    "custom/arch": {
+        "format": "  ",
+        "tooltip": false
+    },
+    "hyprland/workspaces": {
+        "format": "{name}",
+        "format": "{icon}",
+        "tooltip": false,
+        "all-outputs": true,
+        "format-icons": {
+            "active": "",
+            "default": ""
+        }
+    },
+    "clock": {
+        "format": "{: %I:%M %p}",
+    },
+    "cpu": {
+        "interval": 10,
+        "format": " {usage}%"
+    },
+    "memory": {
+        "format": " {}%"
+    },
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "",
+        "tooltip": false,
+        "format-icons": {
+            "headphone": "",
+            "default": ["", "", "󰕾", "󰕾", "󰕾", "", "", ""]
+        },
+        "scroll-step": 1,
+    },
+    "bluetooth": {
+        "format": " {status}",
+        "format-disabled": "", // an empty format will hide the module
+        "format-connected": " {num_connections}",
+        "tooltip-format": "{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}   {device_address}"
+    },
+    "network": {
+        "interface": "wlp0s20f3",
+        "format": "{ifname}",
+        "format-wifi": " {essid}",
+        "format-ethernet": "{ipaddr}/{cidr} ",
+        "format-disconnected": "󰖪 No Network",
+        "tooltip": false,
+    },
+}
