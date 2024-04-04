@@ -1,4 +1,5 @@
 local lsp_zero = require('lsp-zero')
+local cmp = require('cmp')
 
 lsp_zero.on_attach(function(client, bufnr)
     -- see :help lsp-zero-keybindings
@@ -13,6 +14,21 @@ lsp_zero.on_attach(function(client, bufnr)
 
     lsp_zero.default_keymaps({buffer = bufnr})
 end)
+
+cmp.setup({
+    window = {
+        completion = cmp.config.window.bordered(),
+        documentation = cmp.config.window.bordered(),
+    },
+    mapping = cmp.mapping.preset.insert({
+        -- confirm completion
+        ['<Enter>'] = cmp.mapping.confirm({ select = true }),
+
+        -- scroll up and down the documentation window
+        ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-d>'] = cmp.mapping.scroll_docs(4),
+    }),
+})
 
 -- here you can setup the language servers
 

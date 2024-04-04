@@ -8,14 +8,12 @@ create_alias() {
 
     if [[ $action == "sourced" ]]; then
         echo "Creating function called $aliasname that will source $script from the $lab_name lab."
-    else
-        echo "Creating alias called $aliasname that will run $script from the $lab_name lab."
-    fi
 
-    if [[ $action == "sourced" ]]; then
         eval "function $aliasname() { source $lab_root/$script; }"
         alias "$aliasname=$aliasname"
     else
+        echo "Creating alias called $aliasname that will run $script from the $lab_name lab."
+
         chmod +x $lab_root/$script
         alias "$aliasname='$lab_root/$script'"
     fi
@@ -55,7 +53,7 @@ elif [[ $option == "restore" ]]; then
         if [[ $action == "sourced" ]]; then
             echo " - Source $script from the $(basename $lab_root) lab"
         else
-            echo "Run $script from the $(basename $lab_root) lab"
+            echo " - Run $script from the $(basename $lab_root) lab"
         fi
     done
 elif [[ $option == "reset" ]]; then
@@ -73,7 +71,7 @@ if [[ -f $project_cache ]]; then
     tmp_script="/tmp/alias_cache_previewer.sh"
     make_alias_cache_previewer "$tmp_script"
 
-    create_or_restore=$(printf 'create\nrestore\nreset' | fzf --height 40% --layout reverse --prompt "An alias cache for the $project project exists. Would you like to create a new alias or restore the existing aliases for the project? " --preview "$tmp_script {} $project_cache" --preview-window=up:30%)
+    create_or_restore=$(printf 'create\nrestore\nreset' | fzf --layout reverse --prompt "An alias cache for the $project project exists. Would you like to create a new alias or restore the existing aliases for the project? " --preview "$tmp_script {} $project_cache" --preview-window=up:30%)
 
     rm "$tmp_script"
 

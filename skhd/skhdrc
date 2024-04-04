@@ -9,6 +9,12 @@ ctrl + alt + shift - r : yabai -m space --rotate 90
 ctrl + alt - x : yabai -m space --mirror x-axis
 ctrl + alt - y : yabai -m space --mirror y-axis
 
+# Change focus between windows
+ctrl + alt - h : yabai -m window --focus west
+ctrl + alt - j : yabai -m window --focus south
+ctrl + alt - k : yabai -m window --focus north
+ctrl + alt - l : yabai -m window --focus east
+
 # Map Ctrl + W to Option + Backspace when iTerm2 is not focused
 ctrl - w [
     *        : skhd -k "alt - backspace"
