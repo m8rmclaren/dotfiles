@@ -5,7 +5,7 @@ os=$(uname)
 if [[ "$os" == "Darwin" ]]; then
     dev_dirs=$(find ~/Documents/dev -mindepth 2 -maxdepth 2 -type d)
 else
-    dev_dirs=$(find ~/dev --mindepth 2 --maxdepth 2 -type d)
+    dev_dirs=$(find ~/dev -mindepth 2 -maxdepth 2 -type d)
 fi
 
 defaults=("$HOME/.config")

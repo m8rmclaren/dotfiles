@@ -1,0 +1,26 @@
+os=$(uname)
+
+if [[ "$os" == "Darwin" ]]; then
+    base_dev_dir=$(find ~/Documents/dev -mindepth 1 -maxdepth 1 -type d)
+else
+    base_dev_dir=$(find ~/dev -mindepth 1 -maxdepth 1 -type d)
+fi
+
+selected=$(echo -e "${base_dev_dir}" | fzf --layout reverse --prompt "Select the base dev directory to create a new project inside of" --preview "ls {}" --preview-window=up:30%)
+
+read "clonestring?What is the SSH git clone string: "
+
+if [[ -z $clonestring ]]; then
+    exit 1
+fi
+
+default_project_name=$(echo $clonestring | sed 's/.*\///' | sed 's/.git//')
+
+read "projectname?What is the name of the project [$default_project_name]: "
+
+if [[ -z $projectname ]]; then
+    projectname=$default_project_name
+fi
+
+project_dir="$selected/$projectname"
+git clone $clonestring $project_dir

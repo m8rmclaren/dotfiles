@@ -94,7 +94,15 @@ if [[ -f $project_cache ]]; then
     fi
 fi
 
-lab_root=$(find ~/Documents/dev/lab -mindepth 1 -maxdepth 1 -type d | fzf --layout reverse --prompt "Select the lab that contains the script you want to alias: " --preview "tree -C {}" --preview-window=up:30%)
+os=$(uname)
+
+if [[ "$os" == "Darwin" ]]; then
+    lab="~/Documents/dev/lab"
+else
+    lab="$HOME/dev/lab"
+fi
+
+lab_root=$(find "$lab" -mindepth 1 -maxdepth 1 -type d | fzf --layout reverse --prompt "Select the lab that contains the script you want to alias: " --preview "tree -C {}" --preview-window=up:30%)
 
 if [[ -z $lab_root ]]; then
     return 1
@@ -118,6 +126,4 @@ fi
 
 create_alias $lab_root $script $action $aliasname
 cache_alias $lab_root $script $action $aliasname $project_cache
-
-[[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] || source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
