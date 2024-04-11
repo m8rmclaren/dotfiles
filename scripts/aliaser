@@ -95,7 +95,7 @@ fi
 os=$(uname)
 
 if [[ "$os" == "Darwin" ]]; then
-    lab="~/Documents/dev/lab"
+    lab="$HOME/Documents/dev/lab"
 else
     lab="$HOME/dev/lab"
 fi
