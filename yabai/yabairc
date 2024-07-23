@@ -35,6 +35,7 @@ yabai -m rule --add app="^TextEdit$" manage=off
 yabai -m rule --add app="^Keychain Access$" manage=off
 yabai -m rule --add app="^Terminal$" manage=off
 yabai -m rule --add app="^Finder$" manage=off
+yabai -m rule --add app="^Photos$" manage=off
 
 # Bootstrap SketchyBorder
 borders active_color=0xffffffff inactive_color=0x11111b width=4.0 &

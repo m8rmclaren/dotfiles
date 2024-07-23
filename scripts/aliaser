@@ -1,3 +1,10 @@
+# Aliaser is always sourced, meaning the shell environment is not brand new. Reset the important variables
+message=""
+project=""
+project_cache=""
+lab=""
+lab_dirs=""
+lab_root=""
 
 create_alias() {
     local lab_root=$1
@@ -92,23 +99,29 @@ if [[ -f $project_cache ]]; then
     fi
 fi
 
-os=$(uname)
+lab="$HOME/coding/lab"
+lab_dirs=$(find "$lab" -mindepth 2 -maxdepth 2 -type d | awk '!/\.git/')
 
-if [[ "$os" == "Darwin" ]]; then
-    lab="$HOME/Documents/dev/lab"
-else
-    lab="$HOME/dev/lab"
+if echo "$lab_dirs" | grep "$project" > /dev/null; then
+    use_default=$(printf 'yes\nno' | fzf --layout reverse --prompt "Use the $project lab directory as aliaser base? " --header "$project has a lab dir configured, but you may want to alias a script from another directory." --preview-window=up:30%)
+    if [[ $use_default == "yes" ]]; then
+        lab_root=$(echo "$lab_dirs" | grep "$project" | head -n 1)
+        message="Automatically selected the $project lab directory as aliaser base."
+    fi
 fi
-
-lab_root=$(find "$lab" -mindepth 1 -maxdepth 1 -type d | fzf --layout reverse --prompt "Select the lab that contains the script you want to alias: " --preview "tree -C {}" --preview-window=up:30%)
+if [[ -z $lab_root ]]; then
+    lab_root=$(echo -e "$lab_dirs" | fzf --layout reverse --prompt "Select the lab that contains the script you want to alias: " --preview "tree -C {}" --preview-window=up:30%)
+fi
 
 if [[ -z $lab_root ]]; then
     return 1
 fi
 
+available_files=($(find $lab_root -type f -mindepth 1 -maxdepth 1))
+
 lab_name=$(basename $lab_root)
 
-script=$(find $lab_root -type f -mindepth 1 -maxdepth 1 | xargs -I {} basename {} | fzf --layout reverse --prompt "Select the script you want to alias: " --preview "cat $lab_root/{}" --preview-window=up:30%)
+script=$(printf "%s\n" "${available_files[@]}" | xargs -I {} basename {} | fzf --header="$message" --border --layout reverse --prompt "Select the script you want to alias: " --preview "cat $lab_root/{}" --preview-window=up:30%)
 
 action=$(printf 'sourced\nrun' | fzf --height 40% --layout reverse --prompt "Should the script be sourced or run? ")
 
