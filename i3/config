@@ -117,7 +117,7 @@ bindsym $mod+Return exec kitty
 bindsym $mod+Shift+q kill
 
 # start rofi (a program launcher)
-bindsym $mod+space exec "rofi -modi drun, run -show drun"
+bindsym $mod+space exec "rofi -show drun"
 
 #####################################################################################
 ## Window Controls
