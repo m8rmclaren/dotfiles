@@ -1,10 +1,6 @@
 os=$(uname)
 
-if [[ "$os" == "Darwin" ]]; then
-    base_dev_dir=$(find ~/Documents/dev -mindepth 1 -maxdepth 1 -type d)
-else
-    base_dev_dir=$(find ~/dev -mindepth 1 -maxdepth 1 -type d)
-fi
+base_dev_dir=$(find $HOME/coding/dev -mindepth 1 -maxdepth 1 -type d)
 
 selected=$(echo -e "${base_dev_dir}" | fzf --layout reverse --prompt "Select the base dev directory to create a new project inside of" --preview "ls {}" --preview-window=up:30%)
 

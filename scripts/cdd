@@ -1,14 +1,12 @@
 os=$(uname)
 
-if [[ "$os" == "Darwin" ]]; then
-    dev_dirs=$(find ~/Documents/dev -mindepth 2 -maxdepth 2 -type d)
-else
-    dev_dirs=$(find ~/dev -mindepth 2 -maxdepth 2 -type d)
-fi
+dev_dirs=$(find "$HOME/coding/dev" -mindepth 2 -maxdepth 2 -type d)
+lab_dirs=$(find "$HOME/coding/lab" -mindepth 2 -maxdepth 2 -type d)
+default_dirs=("$HOME/.config")
 
-defaults=("$HOME/.config")
+all_dirs=$(echo -e "${dev_dirs}\n${lab_dirs}\n${default_dirs[@]}" | awk '!/\.git/')
 
-selected=$(echo -e "${dev_dirs}\n$(printf "%s\n" $defaults)" | fzf --layout reverse --prompt "Select a project: " --preview "ls {}" --preview-window=up:30%)
+selected=$(echo -e "$all_dirs" | fzf --layout=reverse --prompt="Select a project: " --preview="ls {}" --preview-window=up:30%)
 
 if [ -n "$selected" ]; then
     cd "$selected"
