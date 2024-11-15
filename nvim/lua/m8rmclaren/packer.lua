@@ -7,7 +7,7 @@ return require('packer').startup(function(use)
     use {
         'nvim-telescope/telescope.nvim', tag = '0.1.5',
         -- or                            , branch = '0.1.x',
-        requires = { {'nvim-lua/plenary.nvim'} }
+        requires = { { 'nvim-lua/plenary.nvim' } }
     }
     use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
 
@@ -17,18 +17,18 @@ return require('packer').startup(function(use)
     use {
         "ThePrimeagen/harpoon",
         branch = "harpoon2",
-        requires = { {"nvim-lua/plenary.nvim"} }
+        requires = { { "nvim-lua/plenary.nvim" } }
     }
 
     -- Editor plumbing
-    use({'nvim-treesitter/nvim-treesitter'})
-    use("nvim-treesitter/nvim-treesitter-context")
+    use({ 'nvim-treesitter/nvim-treesitter' })
+    -- use("nvim-treesitter/nvim-treesitter-context")
     use("akinsho/toggleterm.nvim")
     -- use("airblade/vim-gitgutter")
 
     -- Editor niceties
     use("github/copilot.vim") -- Copilot integration
-    use("mbbill/undotree") -- undo history visualizer
+    use("mbbill/undotree")    -- undo history visualizer
     use("tpope/vim-fugitive") -- Git commands in nvim
     use("lukas-reineke/indent-blankline.nvim")
     use("windwp/nvim-autopairs")
@@ -49,15 +49,15 @@ return require('packer').startup(function(use)
         'VonHeikemen/lsp-zero.nvim',
         branch = 'v3.x',
         requires = {
-            {'williamboman/mason.nvim'},
-            {'williamboman/mason-lspconfig.nvim'},
+            { 'williamboman/mason.nvim' },
+            { 'williamboman/mason-lspconfig.nvim' },
 
             -- LSP Support
-            {'neovim/nvim-lspconfig'},
+            { 'neovim/nvim-lspconfig' },
             -- Autocompletion
-            {'hrsh7th/nvim-cmp'},
-            {'hrsh7th/cmp-nvim-lsp'},
-            {'L3MON4D3/LuaSnip'},
+            { 'hrsh7th/nvim-cmp' },
+            { 'hrsh7th/cmp-nvim-lsp' },
+            { 'L3MON4D3/LuaSnip' },
         }
     }
 end)

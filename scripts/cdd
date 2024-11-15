@@ -2,9 +2,9 @@ os=$(uname)
 
 dev_dirs=$(find "$HOME/coding/dev" -mindepth 2 -maxdepth 2 -type d)
 lab_dirs=$(find "$HOME/coding/lab" -mindepth 2 -maxdepth 2 -type d)
-default_dirs=("$HOME/.config")
+default_dirs=("$HOME/.config" "$HOME/coding/tokens")
 
-all_dirs=$(echo -e "${dev_dirs}\n${lab_dirs}\n${default_dirs[@]}" | awk '!/\.git/')
+all_dirs=$(echo -e "${dev_dirs}\n${lab_dirs}\n$(printf "%s\n" ${default_dirs[@]})" | awk '!/\.git/')
 
 selected=$(echo -e "$all_dirs" | fzf --layout=reverse --prompt="Select a project: " --preview="ls {}" --preview-window=up:30%)
 
