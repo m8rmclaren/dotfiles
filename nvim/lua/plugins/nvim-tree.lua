@@ -19,6 +19,10 @@ return {
         -- pass to setup along with your other options
         require("nvim-tree").setup {
             on_attach = my_on_attach,
+            git = {
+                enable = true,
+                ignore = false, -- 👈 This disables filtering gitignored files
+            },
         }
 
         local api = require "nvim-tree.api"
