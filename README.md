@@ -16,35 +16,63 @@ Software
 ## Install
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-## Formulae
+## Yabai
+brew install koekeishiya/formulae/yabai
+yabai --start-service
 
-### Essentials
-brew install wget
-brew install jq
-brew install ripgrep
-brew install skhd
-brew install sketchybar
+## SKHD
+brew install koekeishiya/formulae/skhd
+skhd --start-service
 
-### Terminal
-brew install tmux
-brew install neovim
-brew install zsh-autosuggestions
-brew install zsh-syntax-highlighting
-echo "source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ${ZDOTDIR:-$HOME}/.zshrc
-
-## Casks
-
-### Fonts
-brew install --cask sf-symbols
-
-## Taps
+## FelixKratz
 brew tap FelixKratz/formulae
-
-## Essentials
 brew install borders
+brew install sketchybar
+brew install --cask font-sketchybar-app-font
 
-# Icons
-curl -L https://github.com/kvndrsslr/sketchybar-app-font/releases/download/v2.0.4/sketchybar-app-font.ttf -o $HOME/Library/Fonts/sketchybar-app-font.ttf
+brew services start borders
+brew services start sketchybar
+
+## tmux
+brew install tmux
+git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
+
+## Terminal
+brew install neovim
+brew install fzf
+
+### OMZ
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
+## Other software
+brew install wget jq ripgrep awscli
+
+brew tap hashicorp/tap
+brew install hashicorp/tap/terraform
+
+## Programming languages
+brew install go pyenv cmake
+brew install nvm
+
+### https://github.com/pyenv/pyenv?tab=readme-ov-file#zsh
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
+echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
+echo 'eval "$(pyenv init - zsh)"' >> ~/.zshrc
+
+### nvm
+echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.zshrc
+echo '[ -s "$(brew --prefix nvm)/nvm.sh" ] && \. "$(brew --prefix nvm)/nvm.sh"' >> ~/.zshrc
+echo '[ -s "$(brew --prefix nvm)/etc/bash_completion.d/nvm" ] && \. "$(brew --prefix nvm)/etc/bash_completion.d/nvm"' >> ~/.zshrc
+
+pyenv install 3.11.8
+nvm install node
+
+brew install --cask sf-symbols
+brew install font-hack-nerd-font
 ```
 
 ```shell

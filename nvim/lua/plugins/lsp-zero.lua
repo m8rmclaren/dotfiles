@@ -110,5 +110,8 @@ return {
         require('lspconfig').omnisharp.setup({
             enableDecompilationSupport = true,
         })
+
+        require('lspconfig').clangd.setup({
+        })
     end
 }
