@@ -26,12 +26,17 @@ return {
             -- to learn the available actions
             local opts = { buffer = bufnr, remap = false }
 
-            -- vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
-            -- vim.keymap.set("n", "gb", "<C-o>", opts)
+            -- virtual_text is off by default in nvim 0.11+
+            vim.diagnostic.config({virtual_text=true})
+
+            -- global callbacks for LSP responses are removed in nvim 0.11+, so bordered floating windows must be 
+            -- configured manually per invocation
             vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, opts, { desc = "Code action" })
             vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts, { desc = "Rename under cursor" })
-            vim.keymap.set("i", "<C-S>", function() vim.lsp.buf.signature_help() end, opts,
+            vim.keymap.set("i", "<C-S>", function() vim.lsp.buf.signature_help({ border = "rounded" }) end, opts,
                 { desc = "Signature help under cursor" })
+            vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, opts, { desc = "Code action" })
+            vim.keymap.set("n", "K", function() vim.lsp.buf.hover({ border = "rounded" }) end, opts, { desc = "Hover" })
 
             if vim.bo.filetype == 'cs' then
                 local omnisharp_extended = require('omnisharp_extended')

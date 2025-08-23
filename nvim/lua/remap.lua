@@ -1,5 +1,4 @@
 vim.g.mapleader = " "
--- vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 
 -- Copy and Paste (yank and put)
 

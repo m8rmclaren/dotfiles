@@ -49,7 +49,9 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-m
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 
 ## Other software
-brew install wget jq ripgrep awscli
+brew install wget jq ripgrep awscli coreutils
+brew install --cask spotify
+brew install --cask obsidian
 
 brew tap hashicorp/tap
 brew install hashicorp/tap/terraform
