@@ -27,9 +27,9 @@ return {
             local opts = { buffer = bufnr, remap = false }
 
             -- virtual_text is off by default in nvim 0.11+
-            vim.diagnostic.config({virtual_text=true})
+            vim.diagnostic.config({ virtual_text = true })
 
-            -- global callbacks for LSP responses are removed in nvim 0.11+, so bordered floating windows must be 
+            -- global callbacks for LSP responses are removed in nvim 0.11+, so bordered floating windows must be
             -- configured manually per invocation
             vim.keymap.set("n", "<leader>ca", function() vim.lsp.buf.code_action() end, opts, { desc = "Code action" })
             vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts, { desc = "Rename under cursor" })
@@ -48,14 +48,15 @@ return {
                 vim.keymap.set("n", "gi", omnisharp_extended.telescope_lsp_implementation, opts)
             end
 
-            if client.server_capabilities.documentFormattingProvider then
-                vim.api.nvim_create_autocmd("BufWritePre", {
-                    buffer = bufnr,
-                    callback = function()
-                        vim.lsp.buf.format({ async = false })
-                    end
-                })
-            end
+            -- 08/12/25 superceeded by conform.lua
+            -- if client.server_capabilities.documentFormattingProvider then
+            --     vim.api.nvim_create_autocmd("BufWritePre", {
+            --         buffer = bufnr,
+            --         callback = function()
+            --             vim.lsp.buf.format({ async = false })
+            --         end
+            --     })
+            -- end
 
             lsp_zero.default_keymaps({ buffer = bufnr })
         end)
@@ -97,8 +98,6 @@ return {
         --     matching = { disallow_symbol_nonprefix_matching = false }
         -- })
 
-        -- here you can setup the language servers
-
         require('mason').setup({})
         require('mason-lspconfig').setup({
             -- Replace the language servers listed here
@@ -118,5 +117,15 @@ return {
 
         require('lspconfig').clangd.setup({
         })
+
+        require('lspconfig').sourcekit.setup {
+            capabilities = {
+                workspace = {
+                    didChangeWatchedFiles = {
+                        dynamicRegistration = true,
+                    },
+                },
+            },
+        }
     end
 }

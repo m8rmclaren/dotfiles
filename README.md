@@ -52,12 +52,13 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:
 brew install wget jq ripgrep awscli coreutils
 brew install --cask spotify
 brew install --cask obsidian
+brew install --cask visual-studio-code
 
 brew tap hashicorp/tap
 brew install hashicorp/tap/terraform
 
 ## Programming languages
-brew install go pyenv cmake
+brew install go pyenv cmake rustup
 brew install nvm
 
 ### https://github.com/pyenv/pyenv?tab=readme-ov-file#zsh
