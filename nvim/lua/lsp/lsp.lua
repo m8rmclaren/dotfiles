@@ -29,6 +29,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 -- LSPs to manually config
+vim.lsp.config.clangd = {
+    cmd = {
+        "clangd",
+        "--query-driver=/Applications/ArmGNUToolchain/14.3.rel1/arm-none-eabi/bin/arm-none-eabi-*", -- allow querying the cross GCC
+        "--background-index",
+    },
+}
+
 vim.lsp.config.omnisharp = {
     enableDecompilationSupport = true,
 }
