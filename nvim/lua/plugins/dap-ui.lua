@@ -3,6 +3,7 @@ return {
     dependencies = {
         "mfussenegger/nvim-dap",
         "nvim-neotest/nvim-nio",
+        "nvim-telescope/telescope-dap.nvim",
     },
     lazy = true,
     config = function()
@@ -51,5 +52,20 @@ return {
         dap.listeners.before.event_exited["dapui_config"] = function()
             dapui.close()
         end
+
+        -- Try to break on exceptions/signals (adapter support varies)
+        -- Will stop on things like SIGSEGV if the adapter supports it.
+        pcall(function() dap.set_exception_breakpoints({ "all" }) end)
+
+        -- Jump through stack frames easily, which opens the file/line.
+        local widgets = require("dap.ui.widgets")
+        vim.keymap.set("n", "<leader>df", function()
+            widgets.centered_float(widgets.frames)
+        end, { desc = "DAP: frames" })
+
+        -- Telescope pickers for frames/variables/breakpoints
+        require("telescope").load_extension("dap")
+        vim.keymap.set("n", "<leader>dF", function() require("telescope").extensions.dap.frames() end,
+            { desc = "DAP: frames (Telescope)" })
     end,
 }

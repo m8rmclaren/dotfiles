@@ -53,6 +53,7 @@ brew install wget jq ripgrep awscli coreutils
 brew install --cask spotify
 brew install --cask obsidian
 brew install --cask visual-studio-code
+brew install --cask mactex
 
 brew tap hashicorp/tap
 brew install hashicorp/tap/terraform
@@ -60,6 +61,7 @@ brew install hashicorp/tap/terraform
 ## Programming languages
 brew install go pyenv cmake rustup
 brew install nvm
+brew install deno
 
 ### https://github.com/pyenv/pyenv?tab=readme-ov-file#zsh
 echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc

@@ -25,6 +25,19 @@ vim.api.nvim_create_autocmd('LspAttach', {
             vim.keymap.set('n', '<leader>D', omni.telescope_lsp_type_definition, opts)
             vim.keymap.set('n', 'gi', omni.telescope_lsp_implementation, opts)
         end
+
+        -- Don't let ts_ls & denols compete; stop TS clients that have no root_dir
+        local clients = vim.lsp.get_clients({ bufnr = ev.buf })
+        local typescript_clients = { ts_ls = true, denols = true }
+
+        for _, client in pairs(clients) do
+            if typescript_clients[client.name] then
+                local has_root = client.config and client.config.root_dir and client.config.root_dir ~= ""
+                if not has_root then
+                    client:stop() -- method form replaces deprecated client.stop()
+                end
+            end
+        end
     end,
 })
 
@@ -56,6 +69,17 @@ vim.lsp.config.sourcekit = {
     capabilities = {
         workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
     },
+}
+
+vim.lsp.config.denols = {
+    root_markers = { "deno.json", "deno.jsonc" },
+    single_file_support = false,
+    settings = {},
+}
+
+vim.lsp.config.ts_ls = {
+    root_markers = { "package.json" },
+    single_file_support = false,
 }
 
 -- LSPs to manually enable (IE not automatically enabled by mason-lspconfig)

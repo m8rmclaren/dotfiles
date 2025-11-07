@@ -1,4 +1,8 @@
-# source <(kubectl completion zsh)
+export PATH="$HOME/.local/bin/:$PATH"
+
+if command -v kubectl >/dev/null 2>&1; then
+  source <(kubectl completion zsh)
+fi
 
 alias projectizer='source $HOME/.config/scripts/projectizer'
 alias cdd='source $HOME/.config/scripts/cdd'

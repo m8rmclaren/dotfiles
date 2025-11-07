@@ -7,6 +7,7 @@ return {
         conform.setup({
             formatters_by_ft = {
                 swift = { "swiftformat" },
+                json = { "prettier" }
             },
             format_on_save = {
                 -- These options will be passed to conform.format()

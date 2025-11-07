@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
-dev_dirs=$(find "$HOME/coding/dev" -mindepth 2 -maxdepth 2 -type d)
-default_dirs=("$HOME/.config")
+if [[ $# -gt 0 ]]; then
+    selected="$1"
+else
+    dev_dirs=$(find "$HOME/coding/dev" -mindepth 2 -maxdepth 2 -type d)
+    default_dirs=("$HOME/.config")
 
-all_dirs=$(echo -e "${dev_dirs}\n${default_dirs[@]}" | awk '!/\.git/')
-
-selected=$(echo -e "$all_dirs" | fzf --layout reverse --prompt "Select a project: " --preview "ls {}" --preview-window=up:30%)
+    all_dirs=$(echo -e "${dev_dirs}\n${default_dirs[@]}" | awk '!/\.git/')
+    selected=$(echo -e "$all_dirs" | fzf --layout reverse --prompt "Select a project: " --preview "ls {}" --preview-window=up:30%)
+fi
 
 if [[ -z $selected ]]; then
     exit 0
@@ -20,7 +23,12 @@ if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
 fi
 
 if ! tmux has-session -t=$selected_name 2> /dev/null; then
-    tmux new-session -s $selected_name -c $selected -d
+    tmux new-session -s $selected_name -n "editor" -c $selected -d
+
+    lab_dir="${selected/\/dev\///lab/}"
+    if [[ -d "$lab_dir" ]]; then
+        tmux new-window -t "$selected_name": -n "lab" -c "$lab_dir"
+    fi
 fi
 
 if [[ -z $TMUX ]]; then

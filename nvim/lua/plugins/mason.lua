@@ -3,8 +3,25 @@ return {
     opts = {
         ensure_installed = {
             "lua_ls",
+
+            -- Go
             "gopls",
+            "templ",
+
+            -- Rust
             "rust_analyzer",
+
+            -- Typescript/Javascript
+            "denols",
+            "ts_ls",
+            "eslint",
+            "tailwindcss",
+
+            -- JSON
+            "jsonls",
+
+            -- Terraform
+            "terraformls",
         },
     },
     dependencies = {

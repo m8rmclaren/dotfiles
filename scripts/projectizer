@@ -19,4 +19,21 @@ if [[ -z $projectname ]]; then
 fi
 
 project_dir="$selected/$projectname"
+
+if [[ -d "$project_dir" ]]; then
+    echo "$projectname already exists at $project_dir"
+    return 1
+fi
+
+lab_dir="${project_dir/\/dev\///lab/}"
+if [[ ! -d "$lab_dir" ]]; then
+    create_lab_dir=$(printf 'Yes\nNo' | fzf --layout reverse --prompt "Create a lab directory for $projectname?" --height 40% --layout reverse --border)
+fi
+
 git clone $clonestring $project_dir
+
+if [ "$create_lab_dir" = "Yes" ]; then
+    mkdir -p "$lab_dir"
+fi
+
+sessionizer $project_dir

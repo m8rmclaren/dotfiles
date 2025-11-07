@@ -6,7 +6,7 @@ return {
     config = function()
         local xcodebuild = require("xcodebuild.integrations.dap")
 
-        local codelldbPath = os.getenv("HOME") .. "/.local/bin/codelldb.vsix"
+        local codelldbPath = os.getenv("HOME") .. "/.local/bin/codelldb/extension/adapter/codelldb"
 
         xcodebuild.setup(codelldbPath)
 
