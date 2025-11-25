@@ -4,22 +4,34 @@ base_dev_dir=$(find $HOME/coding/dev -mindepth 1 -maxdepth 1 -type d)
 
 selected=$(echo -e "${base_dev_dir}" | fzf --layout reverse --prompt "Select the base dev directory to create a new project inside of" --preview "ls {}" --preview-window=up:30%)
 
-read "clonestring?What is the SSH git clone string: "
+clone="Clone from Github"
+create="Create"
+clone_or_create=$(printf "$create\n$clone" | fzf --layout reverse --prompt "Create a blank project or create from a Github repo?" --height 40% --layout reverse --border)
 
-if [[ -z $clonestring ]]; then
-    exit 1
-fi
+if [ "$clone_or_create" = "$create" ]; then
+    read "projectname?What is the name of the project: "
+    if [[ -z $projectname ]]; then
+        echo "Project name is required. Exiting"
+        return 1
+    fi
 
-default_project_name=$(echo $clonestring | sed 's/.*\///' | sed 's/.git//')
 
-read "projectname?What is the name of the project [$default_project_name]: "
+else
+    read "clonestring?What is the SSH git clone string: "
 
-if [[ -z $projectname ]]; then
-    projectname=$default_project_name
+    if [[ -z $clonestring ]]; then
+        exit 1
+    fi
+
+    default_project_name=$(echo $clonestring | sed 's/.*\///' | sed 's/.git//')
+
+    read "projectname?What is the name of the project [$default_project_name]: "
+    if [[ -z $projectname ]]; then
+        projectname=$default_project_name
+    fi
 fi
 
 project_dir="$selected/$projectname"
-
 if [[ -d "$project_dir" ]]; then
     echo "$projectname already exists at $project_dir"
     return 1
@@ -30,7 +42,12 @@ if [[ ! -d "$lab_dir" ]]; then
     create_lab_dir=$(printf 'Yes\nNo' | fzf --layout reverse --prompt "Create a lab directory for $projectname?" --height 40% --layout reverse --border)
 fi
 
-git clone $clonestring $project_dir
+if [[ -z $clonestring ]]; then
+    mkdir -p "$project_dir"
+else
+    git clone $clonestring $project_dir
+fi
+
 
 if [ "$create_lab_dir" = "Yes" ]; then
     mkdir -p "$lab_dir"

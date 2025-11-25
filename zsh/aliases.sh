@@ -11,6 +11,7 @@ alias gotest='source $HOME/.config/scripts/go/gotest.sh'
 alias edit='nvim .'
 alias oo='cd "$HOME/Documents/Obsidian Vault/"'
 alias pubip='curl -s https://ifconfig.me | tee >(pbcopy); echo; echo "ip copied to clipboard"'
+alias leetcode='source $HOME/.config/scripts/leetcode'
 
 sessionizer() {
   $HOME/.config/scripts/sessionizer "$@"
