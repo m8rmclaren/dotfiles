@@ -42,7 +42,7 @@ return {
                 gitsigns = true,
                 nvimtree = true,
                 treesitter = true,
-                notify = false,
+                notify = true,
                 mini = {
                     enabled = true,
                     indentscope_color = "",

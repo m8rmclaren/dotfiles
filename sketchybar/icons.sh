@@ -9,6 +9,14 @@ LOCK=􀒳
 BELL=􀋚
 BELL_DOT=􀝗
 
+# Claude usage Icons
+CLAUDE=􀆿
+CLAUDE_TOKENS=􀅴
+CLAUDE_COST=􀖎
+CLAUDE_BURN=􀋥
+CLAUDE_RESET=􀐫
+CLAUDE_MODELS=􀪬
+
 # Git Icons
 GIT_ISSUE=􀍷
 GIT_DISCUSSION=􀒤

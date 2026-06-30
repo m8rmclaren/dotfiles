@@ -13,6 +13,23 @@ alias oo='cd "$HOME/Documents/Obsidian Vault/"'
 alias pubip='curl -s https://ifconfig.me | tee >(pbcopy); echo; echo "ip copied to clipboard"'
 alias leetcode='source $HOME/.config/scripts/leetcode'
 
+export AWS_PROFILE=cypress-prod
 sessionizer() {
   $HOME/.config/scripts/sessionizer "$@"
+}
+
+# Auto-load .env when entering a directory
+function chpwd() {
+  if [[ -f .env ]]; then
+    echo -n "Load .env? [y/N] "
+    read -r answer
+    if [[ "$answer" =~ ^[Yy]$ ]]; then
+      set -o allexport
+      source .env
+      set +o allexport
+      echo "✓ Loaded .env"
+    else
+      echo "– Skipped .env"
+    fi
+  fi
 }

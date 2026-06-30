@@ -10,6 +10,16 @@ return {
         require('telescope').load_extension('harpoon')
 
         require('telescope').setup {
+            pickers = {
+                lsp_references = {
+                    fname_width = 80,
+                    show_line = false,
+                },
+                lsp_definitions = {
+                    fname_width = 80,
+                    show_line = false,
+                },
+            },
             extensions = {
                 -- Your extension configuration goes here:
                 -- extension_name = {

@@ -12,7 +12,7 @@ return {
             "rust_analyzer",
 
             -- Typescript/Javascript
-            "denols",
+            -- "denols",
             "ts_ls",
             "eslint",
             "tailwindcss",
