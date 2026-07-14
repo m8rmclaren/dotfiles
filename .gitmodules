@@ -1,0 +1,3 @@
+[submodule "sketchybar/plugins/sketchybar-claude"]
+	path = sketchybar/plugins/sketchybar-claude
+	url = https://github.com/m8rmclaren/sketchybar-claude.git

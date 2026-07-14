@@ -7,6 +7,7 @@ ITEM_DIR="$CONFIG_DIR/items" # Directory where the items are configured
 PLUGIN_DIR="$CONFIG_DIR/plugins" # Directory where all the plugin scripts are stored
 
 FONT="SF Pro" # Needs to have Regular, Bold, Semibold, Heavy and Black variants
+HIST_FONT="Menlo" # Monospace family with block/sparkline glyphs (SF Pro lacks them)
 PADDINGS=3 # All paddings use this value (icon, label, background)
 
 # Setting up and starting the helper process
@@ -92,7 +93,7 @@ fi
 # Right
 source "$ITEM_DIR/calendar.sh"
 source "$ITEM_DIR/brew.sh"
-source "$ITEM_DIR/claude.sh"
+source "$PLUGIN_DIR/sketchybar-claude/claude.sh"
 source "$ITEM_DIR/github.sh"
 source "$ITEM_DIR/wifi.sh"
 source "$ITEM_DIR/battery.sh"
