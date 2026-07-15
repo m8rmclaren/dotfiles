@@ -16,6 +16,9 @@ CLAUDE_COST=􀖎
 CLAUDE_BURN=􀋥
 CLAUDE_RESET=􀐫
 CLAUDE_MODELS=􀪬
+CLAUDE_HIST=$CLAUDE_MODELS   # stacked-bars glyph, reused for the token history sparkline row
+CLAUDE_COST_HIST=$CLAUDE_COST # dollarsign glyph, reused for the daily-cost sparkline row
+CLAUDE_DOT=●                 # per-model legend swatch (recolored at runtime)
 
 # Git Icons
 GIT_ISSUE=􀍷
