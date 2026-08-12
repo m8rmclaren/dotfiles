@@ -1,0 +1,115 @@
+# checkout — fuzzy-find a git branch and go to it. Meant to be *sourced*
+# (see the `checkout` alias) so that switching to a worktree can cd your shell.
+#
+# Three kinds of targets are shown, each tagged and colored:
+#   worktree (cyan)  branch checked out in another worktree -> cd into it
+#   local    (green) an ordinary local branch              -> git checkout
+#   remote   (yellow) origin/… with no local counterpart   -> checkout --track
+#
+# Usage: checkout [-f|--fetch]   (-f prune-fetches origin first)
+
+__checkout() {
+    if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        echo "Not inside a git repository."
+        return 1
+    fi
+
+    if [[ $1 == "-f" || $1 == "--fetch" ]]; then
+        echo "Fetching from origin..."
+        git fetch --prune origin
+    fi
+
+    local current toplevel worktrees wt_display wt_names locals remotes all selected kind branch
+    current=$(git symbolic-ref --short -q HEAD)
+    toplevel=$(git rev-parse --show-toplevel)
+
+    # Branches checked out in a worktree other than the one we're standing in,
+    # as "branch<TAB>path" lines. These can't be `git checkout`ed, only cd'd to.
+    worktrees=$(git worktree list --porcelain | awk -v cur="$toplevel" '
+        /^worktree / { p = substr($0, 10) }
+        /^branch refs\/heads\// { if (p != cur) print substr($0, 19) "\t" p }')
+
+    wt_display=$(echo "$worktrees" | awk -F'\t' 'NF { printf "  worktree \033[36m%s\033[0m\n", $1 }')
+    wt_names=$(echo "$worktrees" | awk -F'\t' 'NF { print $1 }')
+
+    # Local branches, minus the current one and any that live in a worktree.
+    locals=$(git for-each-ref --format='%(refname:short)' refs/heads \
+        | wt_names="$wt_names" awk -v cur="$current" '
+            BEGIN { n = split(ENVIRON["wt_names"], a, "\n"); for (i = 1; i <= n; i++) if (a[i] != "") ex[a[i]] = 1 }
+            $0 != cur && !($0 in ex) { printf "  local   \033[32m%s\033[0m\n", $0 }')
+
+    # Remote-tracking branches, minus HEAD pointers and any with a local twin
+    # (which covers worktree branches too, since those still have refs/heads).
+    remotes=$(git for-each-ref --format='%(refname:short)' refs/remotes \
+        | awk '!/\/HEAD$/ {print}' \
+        | while read -r ref; do
+            if ! git show-ref --verify --quiet "refs/heads/${ref#*/}"; then
+                printf "  remote  \033[33m%s\033[0m\n" "$ref"
+            fi
+        done)
+
+    all=$(printf '%s\n%s\n%s\n' "$wt_display" "$locals" "$remotes" | sed '/^[[:space:]]*$/d')
+
+    if [[ -z $all ]]; then
+        echo "No other branches or worktrees to switch to."
+        return 0
+    fi
+
+    selected=$(echo -e "$all" | fzf --ansi --layout reverse \
+        --prompt "Checkout branch: " \
+        --header "current: ${current:-<detached>}    [worktree | local | remote]" \
+        --preview 'git log --oneline --graph --color=always -n 20 $(echo {} | awk "{print \$2}")' \
+        --preview-window=right:55%)
+
+    if [[ -z $selected ]]; then
+        return 0
+    fi
+
+    # Some fzf versions return the selection with the ANSI color codes intact;
+    # strip them so the branch name parses cleanly.
+    selected=$(printf '%s' "$selected" | sed $'s/\033\[[0-9;]*m//g')
+
+    kind=$(echo "$selected" | awk '{print $1}')
+    branch=$(echo "$selected" | awk '{print $2}')
+
+    if [[ $kind == "worktree" ]]; then
+        # NB: don't name this `path` — in zsh `path` is an array tied to $PATH,
+        # so `local path` would blank out PATH and break every later command.
+        local wt_path
+        wt_path=$(echo "$worktrees" | awk -F'\t' -v b="$branch" '$1 == b { print $2; exit }')
+        if [[ -n $wt_path ]]; then
+            cd "$wt_path" && echo "Switched to worktree ($branch): $wt_path"
+        else
+            echo "Could not resolve a worktree path for $branch"
+            return 1
+        fi
+    elif [[ $kind == "remote" ]]; then
+        local local_name=${branch#*/}
+        if git show-ref --verify --quiet "refs/heads/$local_name"; then
+            git checkout "$local_name"
+        else
+            git checkout -b "$local_name" --track "$branch"
+        fi
+    else
+        git checkout "$branch"
+    fi
+
+    # Retarget the dev stack (tagged tmux panes) to wherever we just landed, if
+    # the repo declares roles in a `.hdev` file and we're inside tmux. `hdev` is
+    # the shell function in zsh/aliases.sh, which resolves the repo's own
+    # scripts/hdev — in scope here because this file is sourced, not executed.
+    # Gate on the MAIN worktree's .hdev — it's git's first `worktree list` entry,
+    # and the config may be untracked and thus absent from linked worktrees. The
+    # target (toplevel path) resolves uniformly for worktree cd, in-place
+    # checkout, and remote track-and-checkout.
+    # NB: no `cd` here — a chpwd hook could echo into the command substitution
+    # and corrupt the path.
+    local hdev_main
+    hdev_main=$(git worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2; exit}')
+    if [[ -n $TMUX && -f "$hdev_main/.hdev" ]] && command -v hdev >/dev/null 2>&1; then
+        hdev switch "$(git rev-parse --show-toplevel 2>/dev/null)" || true
+    fi
+}
+
+__checkout "$@"
+unset -f __checkout
