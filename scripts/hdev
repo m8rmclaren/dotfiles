@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+#
+# Forwarder. hdev proper is vendored per-repo (see hermes/scripts/hdev) so the
+# repo that documents it as required tooling actually ships it. Nothing here may
+# grow logic — the moment it does, there are two hdevs and they drift.
+#
+# Kept because shells that resolved this path before the move (long-running
+# sessions, cached shell snapshots, the zsh function's older definition) would
+# otherwise fail with a bare "no such file or directory".
+#
+# Resolve via the git COMMON dir, not the toplevel: every linked worktree must
+# run the primary checkout's copy, so an edit in flight on a wip/ branch cannot
+# break another session's stack.
+
+set -euo pipefail
+
+repo="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
+[ -n "$repo" ] && repo="$(dirname "$repo")"
+
+if [ -n "$repo" ] && [ -x "$repo/scripts/hdev" ]; then
+  exec "$repo/scripts/hdev" "$@"
+fi
+
+echo "hdev: no scripts/hdev in this repo (hdev is vendored per-repo)" >&2
+exit 1

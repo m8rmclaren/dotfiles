@@ -54,5 +54,54 @@ return {
             group = group,
             callback = persist_tree_width,
         })
+
+        -- Keep git decorations in sync with out-of-band edits (Claude Code, a
+        -- tmux pane, a rebase in another window). nvim-tree only re-runs
+        -- `git status` when .git/{HEAD,index,config,FETCH_HEAD} changes, so an
+        -- agent rewriting a tracked file leaves the tree showing stale status.
+        -- Its directory watchers still catch created/deleted files; only the
+        -- status of existing files goes stale.
+        local refresh_timer = nil
+        local function refresh_tree(full)
+            if refresh_timer then
+                refresh_timer:stop()
+            end
+            -- Debounce: an agent editing ten files in a burst should cost one
+            -- `git status`, not ten.
+            refresh_timer = vim.defer_fn(function()
+                refresh_timer = nil
+                -- git.reload re-runs status and redraws; tree.reload also
+                -- rescans the filesystem, for when files appeared or vanished.
+                pcall(full and api.tree.reload or api.git.reload)
+            end, 200)
+        end
+
+        -- Entry point for the Claude Code hook, which pokes this over nvim's
+        -- RPC socket the moment a tool call finishes writing.
+        _G.NvimTreeGitRefresh = function()
+            refresh_tree(true)
+        end
+        vim.api.nvim_create_user_command('NvimTreeGitRefresh', _G.NvimTreeGitRefresh,
+            { desc = 'Refresh nvim-tree git status after external edits' })
+
+        local refresh_group = vim.api.nvim_create_augroup('NvimTreeExternalRefresh', { clear = true })
+
+        vim.api.nvim_create_autocmd({ 'FocusGained', 'BufWritePost', 'FileChangedShellPost' }, {
+            group = refresh_group,
+            callback = function()
+                refresh_tree(false)
+            end,
+            desc = 'Refresh nvim-tree git status',
+        })
+
+        -- Leaving or closing a terminal is the moment out-of-band edits have
+        -- landed and you're looking at the tree again, so rescan fully here.
+        vim.api.nvim_create_autocmd({ 'TermLeave', 'TermClose' }, {
+            group = refresh_group,
+            callback = function()
+                refresh_tree(true)
+            end,
+            desc = 'Refresh nvim-tree after leaving a terminal',
+        })
     end
 }
