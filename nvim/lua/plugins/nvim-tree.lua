@@ -19,6 +19,16 @@ return {
         -- pass to setup along with your other options
         require("nvim-tree").setup {
             on_attach = my_on_attach,
+            -- Expand the tree to whatever file you land on, so jumping via
+            -- Telescope leaves the tree pointed at that file instead of wherever
+            -- it was last.
+            update_focused_file = {
+                enable = true,
+                -- Leave the tree root alone; only change it manually via <C-t>
+                -- / :NvimTreeFindFile. Set to true to have the root follow files
+                -- opened outside the current root.
+                update_root = false,
+            },
             view = {
                 -- Don't equalize other windows when the tree resizes, so a
                 -- manually-widened tree doesn't disturb the file window.

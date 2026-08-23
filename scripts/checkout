@@ -6,7 +6,10 @@
 #   local    (green) an ordinary local branch              -> git checkout
 #   remote   (yellow) origin/… with no local counterpart   -> checkout --track
 #
-# Usage: checkout [-f|--fetch]   (-f prune-fetches origin first)
+# Usage: checkout [-f|--fetch] [branch]
+#   -f       prune-fetch origin first
+#   branch   skip the picker when it names a target exactly; otherwise it seeds
+#            the fzf query, and a single match is taken without prompting
 
 __checkout() {
     if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
@@ -14,7 +17,18 @@ __checkout() {
         return 1
     fi
 
-    if [[ $1 == "-f" || $1 == "--fetch" ]]; then
+    local fetch=0 query=""
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -f|--fetch) fetch=1 ;;
+            --) shift; query=$1; break ;;
+            -*) echo "checkout: unknown option $1"; return 1 ;;
+            *)  query=$1 ;;
+        esac
+        shift
+    done
+
+    if (( fetch )); then
         echo "Fetching from origin..."
         git fetch --prune origin
     fi
@@ -55,14 +69,44 @@ __checkout() {
         return 0
     fi
 
-    selected=$(echo -e "$all" | fzf --ansi --layout reverse \
-        --prompt "Checkout branch: " \
-        --header "current: ${current:-<detached>}    [worktree | local | remote]" \
-        --preview 'git log --oneline --graph --color=always -n 20 $(echo {} | awk "{print \$2}")' \
-        --preview-window=right:55%)
+    if [[ -n $query && $query == "$current" ]]; then
+        echo "Already on $current."
+        return 0
+    fi
+
+    # An argument that names a target outright wins without the picker: match the
+    # branch column exactly, then retry allowing a remote's origin/ prefix to be
+    # left off. Only if neither hits does the name become an fzf query.
+    if [[ -n $query ]]; then
+        local plain
+        plain=$(printf '%s' "$all" | sed $'s/\033\[[0-9;]*m//g')
+        selected=$(echo "$plain" | awk -v q="$query" '$2 == q { print; exit }')
+        [[ -z $selected ]] && selected=$(echo "$plain" | awk -v q="$query" '
+            $1 == "remote" && substr($2, index($2, "/") + 1) == q { print; exit }')
+    fi
 
     if [[ -z $selected ]]; then
-        return 0
+        # --select-1/--exit-0 only when a name was given, so that an unambiguous
+        # argument never stops to ask, while the bare picker always shows itself.
+        local -a fzf_extra
+        fzf_extra=()
+        [[ -n $query ]] && fzf_extra=(--query "$query" --select-1 --exit-0)
+
+        selected=$(echo -e "$all" | fzf --ansi --layout reverse \
+            --prompt "Checkout branch: " \
+            --header "current: ${current:-<detached>}    [worktree | local | remote]" \
+            --preview 'git log --oneline --graph --color=always -n 20 $(echo {} | awk "{print \$2}")' \
+            --preview-window=right:55% "${fzf_extra[@]}")
+        local rc=$?
+
+        if [[ -z $selected ]]; then
+            # rc 1 is fzf's "nothing matched"; 130 is a deliberate ESC/Ctrl-C.
+            if [[ -n $query && $rc -eq 1 ]]; then
+                echo "No branch or worktree matching '$query'."
+                return 1
+            fi
+            return 0
+        fi
     fi
 
     # Some fzf versions return the selection with the ANSI color codes intact;
