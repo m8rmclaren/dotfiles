@@ -15,8 +15,6 @@ alias pubip='curl -s https://ifconfig.me | tee >(pbcopy); echo; echo "ip copied 
 alias leetcode='source $HOME/.config/scripts/leetcode'
 alias checkout='source $HOME/.config/scripts/checkout'
 
-export AWS_PROFILE=cypress-prod
-
 sessionizer() {
   $HOME/.config/scripts/sessionizer "$@"
 }

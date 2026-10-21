@@ -22,6 +22,9 @@ return {
 
             -- Terraform
             "terraformls",
+
+            -- Markdown (gd on links, heading refs, wiki-links)
+            "marksman",
         },
     },
     dependencies = {
