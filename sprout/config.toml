@@ -1,0 +1,2 @@
+# See config.example.toml in the sprout repo for every option.
+listen = "127.0.0.1:7777, 100.102.180.14:7777"
