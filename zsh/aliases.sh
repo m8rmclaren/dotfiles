@@ -1,8 +1,13 @@
 export PATH="$HOME/.local/bin/:$PATH"
-autoload -Uz compinit && compinit
+# compinit is run by oh-my-zsh; source this file after oh-my-zsh.sh
 
 if command -v kubectl >/dev/null 2>&1; then
   source <(kubectl completion zsh)
+fi
+
+# pbcopy is macOS-only; map it to the X11 clipboard elsewhere
+if ! command -v pbcopy >/dev/null 2>&1 && command -v xclip >/dev/null 2>&1; then
+  pbcopy() { xclip -selection clipboard "$@"; }
 fi
 
 alias projectizer='source $HOME/.config/scripts/projectizer'
