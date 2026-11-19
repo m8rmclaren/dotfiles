@@ -2,7 +2,7 @@
 
 # Script that gets called by Display Manager before the login dialog appears
 
-feh --bg-scale --randomize /home/hroszell/.config/wallpaper
+feh --bg-scale --randomize "$HOME/.config/wallpaper"
 
 # if type "openrgb"; then
 #     openrgb -d 0 -m Direct -c FFFFFF

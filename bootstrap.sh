@@ -41,10 +41,10 @@ export PATH="$HOME/.local/bin:$PATH"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 
 sudo apt install fontconfig -y
-sudo curl https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf -o /usr/local/share/fonts/MesloLGS\ NF\ Regular.ttf
-sudo curl https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf -o /usr/local/share/fonts/MesloLGS\ NF\ Bold.ttf
-sudo curl https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf -o /usr/local/share/fonts/MesloLGS\ NF\ Italic.ttf
-sudo curl https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -o /usr/local/share/fonts/MesloLGS\ NF\ Bold\ Italic.ttf
+sudo curl -fL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf -o /usr/local/share/fonts/MesloLGS\ NF\ Regular.ttf
+sudo curl -fL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf -o /usr/local/share/fonts/MesloLGS\ NF\ Bold.ttf
+sudo curl -fL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf -o /usr/local/share/fonts/MesloLGS\ NF\ Italic.ttf
+sudo curl -fL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -o /usr/local/share/fonts/MesloLGS\ NF\ Bold\ Italic.ttf
 sudo fc-cache -fv
 
 echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
