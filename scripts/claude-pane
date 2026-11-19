@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+# claude-pane: put Claude Code sessions into the tmux window I'm looking at,
+# so a bot (grok bot) can manage them while I watch.
+#
+#   claude-pane spawn [-c dir] [-n name] [--] [claude args...]
+#       Split a pane into primary's first window and run claude there. Prints
+#       the pane id (%NN), which is the handle for every other subcommand.
+#   claude-pane ls                      Spawned panes: id, window, name, cwd, command
+#   claude-pane peek <pane> [lines]     Last N lines of the pane (default 60)
+#   claude-pane send <pane> <text...>   Paste text into the pane and press Enter
+#   claude-pane kill <pane>             Close the pane
+#
+# Panes only ever go into the first window of session "primary", so every
+# agent is somewhere I can see it. primary is created by sessionizer;
+# claude-pane never creates it.
+#
+# Panes are spawned with -d, so focus never moves off whatever I'm typing in.
+# The new pane comes out of the biggest existing pane, leaving my layout
+# alone. If that would leave claude too cramped, spawn refuses: the window is
+# full, and an agent has to be killed before another can start.
+set -euo pipefail
+
+MIN_COLS=${CLAUDE_PANE_MIN_COLS:-60}
+MIN_ROWS=${CLAUDE_PANE_MIN_ROWS:-12}
+
+die() { echo "claude-pane: $*" >&2; exit 1; }
+
+# ^ is tmux's "lowest-numbered window", so this survives renumbering.
+TARGET='=primary:^'
+
+spawn() {
+    local dir="$PWD" name=""
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -c) dir=$2; shift 2 ;;
+            -n) name=$2; shift 2 ;;
+            --) shift; break ;;
+            *) break ;;
+        esac
+    done
+    [[ -d $dir ]] || die "no such directory: $dir"
+    tmux has-session -t '=primary' 2>/dev/null \
+        || die "no primary session; run sessionizer to create it"
+    [[ -n $name ]] || name=$(basename "$dir")
+
+    # The tmux server comes from systemd with a bare environment, so run claude
+    # inside a login+interactive zsh to pick up PATH from my rc files. When
+    # claude exits, drop to a shell so the transcript stays on screen.
+    local cmd=(zsh -lic 'claude "$@"; exec zsh -l' claude-pane "$@")
+
+    # Biggest pane in the window, and which way to cut it. Cells are about
+    # twice as tall as wide, so only go side by side if the pane is wide.
+    local w h big flag
+    read -r w h big < <(tmux list-panes -t "$TARGET" -F '#{pane_width} #{pane_height} #{pane_id}' \
+        | awk '{ print $1 * $2, $0 }' | sort -rn | awk 'NR == 1 { print $2, $3, $4 }')
+    [[ -n ${big:-} ]] || die "primary has no first window"
+    # Preferred cut first, the other one if that leaves claude too cramped.
+    local fits_h=0 fits_v=0
+    (( w / 2 >= MIN_COLS )) && fits_h=1
+    (( h / 2 >= MIN_ROWS )) && fits_v=1
+    if (( w > h * 2 )); then
+        if (( fits_h )); then flag=-h; elif (( fits_v )); then flag=-v; fi
+    else
+        if (( fits_v )); then flag=-v; elif (( fits_h )); then flag=-h; fi
+    fi
+    [[ -n ${flag:-} ]] \
+        || die "primary's first window is full (biggest pane is ${w}x${h}); kill an agent first"
+
+    local pane
+    pane=$(tmux split-window -d $flag -t "$big" -c "$dir" -P -F '#{pane_id}' -- "${cmd[@]}")
+
+    tmux set-option -p -t "$pane" @claude_pane 1
+    tmux set-option -p -t "$pane" @task "$name"
+    tmux select-pane -t "$pane" -T "$name"
+    echo "$pane"
+}
+
+list() {
+    tmux list-panes -a -F '#{@claude_pane}	#{pane_id}	#{session_name}:#{window_index}	#{@task}	#{pane_current_path}	#{pane_current_command}' \
+        | awk -F '\t' '$1 == "1" { $1 = ""; sub(/^\t/, ""); print }' OFS='\t'
+}
+
+peek() {
+    [[ -n ${1:-} ]] || die "usage: claude-pane peek <pane> [lines]"
+    # Drop the blank rows below the prompt, then keep the last N real lines.
+    tmux capture-pane -p -J -t "$1" -S "-${2:-60}" \
+        | awk 'NF { last = NR } { line[NR] = $0 } END { for (i = 1; i <= last; i++) print line[i] }' \
+        | tail -n "${2:-60}"
+}
+
+send() {
+    [[ $# -ge 2 ]] || die "usage: claude-pane send <pane> <text...>"
+    local pane=$1; shift
+    local buf="claude-pane-$$"
+    # Bracketed paste so multi-line text lands as one message instead of
+    # submitting at the first newline; then Enter as a separate key.
+    printf '%s' "$*" | tmux load-buffer -b "$buf" -
+    tmux paste-buffer -p -d -b "$buf" -t "$pane"
+    sleep 0.2
+    tmux send-keys -t "$pane" Enter
+}
+
+case ${1:-} in
+    spawn) shift; spawn "$@" ;;
+    ls) list ;;
+    peek) shift; peek "$@" ;;
+    send) shift; send "$@" ;;
+    kill) shift; tmux kill-pane -t "${1:?usage: claude-pane kill <pane>}" ;;
+    *) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac

@@ -9,6 +9,7 @@ sudo apt install build-essential -y
 
 mkdir -p ~/.local/bin
 ln -s $HOME/.config/scripts/sessionizer ~/.local/bin
+ln -s $HOME/.config/scripts/claude-pane ~/.local/bin
 
 # Install tmux plugin manager
 git clone https://github.com/tmux-plugins/tpm $HOME/.config/tmux/plugins/tpm

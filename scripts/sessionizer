@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# "primary" is the long-lived session whose first window claude-pane spawns
+# Claude panes into. When it's missing, offer to make this run's session
+# primary instead of naming it after the project.
+if ! tmux has-session -t=primary 2> /dev/null; then
+    create_primary=$(printf 'Yes\nNo' | fzf --layout reverse --prompt "No primary session. Create it? " --height 40% --border)
+fi
+
 if [[ $# -gt 0 ]]; then
     selected="$1"
 else
@@ -14,7 +21,11 @@ if [[ -z $selected ]]; then
     exit 0
 fi
 
-selected_name=$(basename "$selected" | tr . _)
+if [[ $create_primary == "Yes" ]]; then
+    selected_name=primary
+else
+    selected_name=$(basename "$selected" | tr . _)
+fi
 tmux_running=$(pgrep tmux)
 
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
