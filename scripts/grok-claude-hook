@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# grok-claude-hook: Claude Code hook that tells Grok Bot (Engineering) when a
+# session it started with claude-pane stops or needs input.
+#
+# Sessions Hayden starts himself never have GROK_BOT_PANE set, so for them
+# this exits immediately and sends nothing.
+#
+# Wired in ~/.claude/settings.json under Stop and Notification (async):
+#   "command": "$HOME/.config/scripts/grok-claude-hook"
+#
+# Webhook config holds a secret, so it lives OUTSIDE the dotfiles repo:
+#   ~/.local/share/grok-bot/webhook.env   (chmod 600)
+#     GROK_WEBHOOK_URL='https://...'
+#     GROK_WEBHOOK_HEADER='<Header-Name>: <key>'   # as the routine panel says to send it
+set -uo pipefail
+
+[[ -n ${GROK_BOT_PANE:-} ]] || exit 0
+
+conf=${GROK_WEBHOOK_ENV:-$HOME/.local/share/grok-bot/webhook.env}
+[[ -r $conf ]] || exit 0
+# shellcheck disable=SC1090
+source "$conf"
+[[ -n ${GROK_WEBHOOK_URL:-} ]] || exit 0
+
+input=$(cat)
+
+# The idle "waiting for your input" notification always follows a Stop the
+# bot already heard about, so drop it. Permission prompts etc. still go out.
+if jq -e '.hook_event_name == "Notification" and
+          ((.notification_type // "") == "idle_prompt" or
+           ((.message // "") | test("waiting for your input"; "i")))' \
+        <<<"$input" >/dev/null 2>&1; then
+    exit 0
+fi
+
+payload=$(jq -c \
+    --arg host "$(hostname -s)" \
+    --arg pane "$GROK_BOT_PANE" \
+    --arg task "${GROK_BOT_TASK:-}" \
+    '{host: $host, pane: $pane, task: $task,
+      event: .hook_event_name, session_id: .session_id, cwd: .cwd,
+      message: (.message // null)}' <<<"$input") || exit 0
+
+curl -fsS -m 10 -X POST \
+    -H 'Content-Type: application/json' \
+    ${GROK_WEBHOOK_HEADER:+-H "$GROK_WEBHOOK_HEADER"} \
+    --data "$payload" "$GROK_WEBHOOK_URL" >/dev/null 2>&1
+
+exit 0

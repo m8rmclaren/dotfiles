@@ -46,7 +46,9 @@ spawn() {
     # The tmux server comes from systemd with a bare environment, so run claude
     # inside a login+interactive zsh to pick up PATH from my rc files. When
     # claude exits, drop to a shell so the transcript stays on screen.
-    local cmd=(zsh -lic 'claude "$@"; exec zsh -l' claude-pane "$@")
+    # GROK_BOT_PANE/GROK_BOT_TASK are set for claude only (not the fallback
+    # shell) so grok-claude-hook reports this session and ignores my own.
+    local cmd=(zsh -lic 'GROK_BOT_PANE=$TMUX_PANE GROK_BOT_TASK=$1 claude "${@:2}"; exec zsh -l' claude-pane "$name" "$@")
 
     # Biggest pane in the window, and which way to cut it. Cells are about
     # twice as tall as wide, so only go side by side if the pane is wide.

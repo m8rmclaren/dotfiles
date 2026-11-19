@@ -14,6 +14,7 @@ alias oo='cd "$HOME/Documents/Obsidian Vault/"'
 alias pubip='curl -s https://ifconfig.me | tee >(pbcopy); echo; echo "ip copied to clipboard"'
 alias leetcode='source $HOME/.config/scripts/leetcode'
 alias checkout='source $HOME/.config/scripts/checkout'
+alias claude-pane='$HOME/.config/scripts/claude-pane'
 
 sessionizer() {
   $HOME/.config/scripts/sessionizer "$@"
