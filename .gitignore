@@ -34,3 +34,6 @@ create-next-app-nodejs
 gcloud
 vault
 gh
+
+# Local app state
+alyn/

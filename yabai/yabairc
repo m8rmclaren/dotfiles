@@ -38,6 +38,8 @@ yabai -m rule --add app="^Finder$" manage=off
 yabai -m rule --add app="^Photos$" manage=off
 yabai -m rule --add app="^Logi Options+$" manage=off
 yabai -m rule --add app="^FaceTime$" manage=off
+yabai -m rule --add app="^Calendar$" manage=off
+yabai -m rule --add app="^Contacts$" manage=off
 
 # Bootstrap SketchyBorder
 borders active_color=0xffffffff inactive_color=0x11111b width=4.0 &
